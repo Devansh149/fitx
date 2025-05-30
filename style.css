@@ -34,7 +34,7 @@ nav li a {
   text-decoration: none;
   padding: 10px 18px;
   border-radius: 8px;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, transform 0.2s ease;
   font-weight: 500;
 }
 
@@ -45,11 +45,17 @@ nav li a.signin-btn {
 
 nav li a:hover {
   background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
 }
 
 nav li a.signin-btn:hover {
   background: #00bcd4;
   color: white;
+}
+
+nav li a.active {
+  background: #00e6ff;
+  color: #001b29;
 }
 
 .hero {
@@ -60,7 +66,23 @@ nav li a.signin-btn:hover {
   align-items: center;
 }
 
-#text-box {
+.tab-content {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 60px 40px;
+  align-items: center;
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#home #text-box {
   max-width: 450px;
   background: rgba(255, 255, 255, 0.1);
   padding: 30px;
@@ -69,46 +91,131 @@ nav li a.signin-btn:hover {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
-#text-box p {
+#home #text-box p {
   font-size: 48px;
   line-height: 1.2;
   margin: 10px 0;
 }
 
-#text-box .highlight {
+#home #text-box .highlight {
   color: #00e6ff;
   font-weight: 700;
 }
 
-#text-box .tagline {
+#home #text-box .tagline {
   font-size: 18px;
   color: #d9f3ff;
   margin-top: 10px;
   font-style: italic;
 }
 
-#fitnessForm {
-  margin-top: 20px;
+#track #text-box {
+  max-width: 900px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
-#fitnessForm input[type="number"],
-#fitnessForm label,
-#fitnessForm button {
-  display: block;
-  width: 100%;
-  margin-top: 12px;
+#streakCounter {
+  margin-bottom: 20px;
   font-size: 16px;
+  font-weight: 600;
+  opacity: 0;
+  animation: slideIn 0.5s ease forwards;
 }
 
-#fitnessForm input {
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+#calendarSection {
+  flex: 1;
+  min-width: 280px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 12px;
+  position: relative;
+}
+
+#fitnessForm {
+  flex: 1;
+  min-width: 280px;
+}
+
+#fitnessForm .input-group {
+  position: relative;
+  margin-top: 12px;
+}
+
+#fitnessForm input[type="number"] {
+  width: 100%;
   padding: 10px;
   border-radius: 8px;
   border: none;
   background-color: rgba(255, 255, 255, 0.9);
   color: #000;
+  font-size: 14px;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+#fitnessForm input[type="number"]:focus {
+  box-shadow: 0 0 8px rgba(0, 230, 255, 0.5);
+  outline: none;
+}
+
+#fitnessForm input:valid + .input-feedback::after {
+  content: '✅';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  opacity: 0;
+  animation: fadeInIcon 0.3s ease forwards;
+}
+
+#fitnessForm input:invalid + .input-feedback::after {
+  content: '❌';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  opacity: 0;
+  animation: fadeInIcon 0.3s ease forwards;
+}
+
+@keyframes fadeInIcon {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+#fitnessForm label {
+  margin-top: 12px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#fitnessForm .icon {
+  font-size: 16px;
+}
+
+#fitnessForm .form-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
 }
 
 #fitnessForm button {
+  flex: 1;
   padding: 12px;
   border: none;
   background-color: #00c6ff;
@@ -116,8 +223,11 @@ nav li a.signin-btn:hover {
   font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
-  margin-top: 15px;
   transition: transform 0.2s, background 0.3s;
+}
+
+#fitnessForm button#resetForm {
+  background-color: #ff4d4d;
 }
 
 #fitnessForm button:hover {
@@ -126,17 +236,205 @@ nav li a.signin-btn:hover {
   color: white;
 }
 
-#resultBox {
-  margin-top: 20px;
-  background-color: rgba(0, 255, 255, 0.1);
-  padding: 15px;
-  border-radius: 10px;
-  border: 1px solid #00c6ff;
-  text-align: center;
-  color: #fff;
+#fitnessForm button#resetForm:hover {
+  background-color: #cc0000;
 }
 
-/* 3D model */
+#fitnessForm button:active {
+  animation: bounce 0.2s ease;
+}
+
+@keyframes bounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+#resultBox {
+  flex: 1;
+  min-width: 280px;
+  background-color: rgba(0, 255, 255, 0.15);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #00c6ff;
+  text-align: left;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  opacity: 0;
+  animation: slideIn 0.5s ease forwards 0.2s;
+}
+
+#resultBox:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 255, 255, 0.3);
+}
+
+#resultBox h3 {
+  font-size: 18px;
+  margin: 0 0 10px;
+  color: #00e6ff;
+}
+
+#resultBox p {
+  margin: 5px 0;
+  font-size: 13px;
+}
+
+#progressRing {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.progress-ring-bg {
+  fill: none;
+  stroke: #002b45;
+  stroke-width: 4;
+}
+
+.progress-ring {
+  fill: none;
+  stroke: #00e6ff;
+  stroke-width: 4;
+  stroke-dasharray: 226;
+  stroke-dashoffset: 226;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-ring.active {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% { stroke: #00e6ff; }
+  50% { stroke: #00bcd4; }
+  100% { stroke: #00e6ff; }
+}
+
+#progressText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  color: #00e6ff;
+}
+
+#calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+#calendarHeader button {
+  background: none;
+  border: none;
+  color: #00e6ff;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.3s, transform 0.2s;
+}
+
+#calendarHeader button:hover {
+  color: #00bcd4;
+  transform: scale(1.1);
+}
+
+#monthYear {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#calendarDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 12px;
+  color: #d9f3ff;
+  margin-bottom: 5px;
+}
+
+#calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  text-align: center;
+}
+
+.calendar-day {
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  font-size: 12px;
+  position: relative;
+  opacity: 0;
+  animation: fadeInDay 0.3s ease forwards;
+  animation-delay: calc(var(--index) * 0.05s);
+}
+
+.calendar-day:not(.empty) {
+  --index: 0;
+}
+
+@keyframes fadeInDay {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.calendar-day:hover:not(.empty) {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.calendar-day.tracked:hover:after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10;
+  opacity: 0;
+  animation: fadeInTooltip 0.3s ease forwards;
+}
+
+@keyframes fadeInTooltip {
+  from { opacity: 0; transform: translate(-50%, 5px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.calendar-day.empty {
+  background: transparent;
+  cursor: default;
+}
+
+.calendar-day.tracked {
+  background: #00c6ff;
+  color: #002b45;
+}
+
+.calendar-day.selected {
+  border: 2px solid #00e6ff;
+  transform: scale(1.05);
+}
+
 .model-container {
   width: 400px;
   height: 400px;
@@ -160,4 +458,87 @@ nav li a.signin-btn:hover {
   transform: translate(-50%, -50%);
   color: #00e6ff;
   font-weight: bold;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  margin: 15% auto;
+  position: relative;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #000;
+}
+
+.modal-content button {
+  width: 100%;
+  padding: 10px;
+  background-color: #00c6ff;
+  color: #002b45;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.modal-content button:hover {
+  background-color: #009acb;
+  transform: scale(1.03);
+  color: white;
+}
+
+.modal-content button:active {
+  animation: bounce 0.2s ease;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  color: #00e6ff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #00bcd4;
+}
+
+#msg {
+  color: #fff;
+  text-align: center;
+  margin: 10px 0;
+}
+
+@media (max-width: 768px) {
+  #track #text-box {
+    flex-direction: column;
+    align-items: center;
+  }
+  #calendarSection, #fitnessForm, #resultBox {
+    min-width: 100%;
+  }
 }
