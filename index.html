@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fitness Landing Page</title>
+  <title>Gamified Fitness</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r169/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/loaders/GLTFLoader.js"></script>
 </head>
 <body>
   <nav>
     <img src="img2.png" alt="Logo" />
     <ul>
-      <li><a href="/">Home</a></li>
-      <li><a href="/about">About</a></li>
-      <li><a href="/contact">Contact Us</a></li>
+      <li><a href="#">Home</a></li>
+      
+      <li><a href="#contact">Contact</a></li>
       <li><a href="#" class="signin-btn" onclick="openModal()">Sign In</a></li>
     </ul>
   </nav>
@@ -22,35 +24,140 @@
       <p>Gamify Your</p>
       <p class="highlight">Fitness Journey</p>
       <p class="tagline">Track. Level Up. Stay Consistent.</p>
+      <form id="fitnessForm">
+        <input type="number" placeholder="Enter Height (cm)" id="height" required />
+        <input type="number" placeholder="Enter Weight (kg)" id="weight" required />
+        <label><input type="checkbox" id="healthyEating" /> Ate Healthy Today</label><br>
+        <label><input type="checkbox" id="didExercise" /> Did Exercise</label><br>
+        <label><input type="checkbox" id="completedSteps" /> Completed 10,000 Steps</label><br>
+        <button type="submit">Update Fitness</button>
+      </form>
+      <div id="resultBox"></div>
     </div>
-    <img src="img1.png" alt="girl" id="we" />
+
+    <div class="model-container">
+      <canvas id="modelCanvas"></canvas>
+      <div id="loading">Loading Model...</div>
+    </div>
   </main>
 
-  <div id="signinModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h2>Sign In</h2>
-      <input type="email" placeholder="Email" required />
-      <input type="password" placeholder="Password" required />
-      <button>Login</button>
-    </div>
-  </div>
+  <footer id="contact" style="background-color: rgba(0, 0, 0, 0.5); color: white; text-align: center; padding: 30px;">
+    <h2>Developers</h2>
+    <p>
+      <strong>Devansh Chandra</strong> – SRMIST<br>
+      <a href="mailto:devanshchandra300@gmail.com" style="color: #00e6ff;">devanshchandra300@gmail.com</a>
+    </p>
+    <p>
+      <strong>Ridhii Jain</strong> – NSUT Delhi<br>
+      <a href="mailto:ridhiijain6@gmail.com" style="color: #00e6ff;">ridhiijain6@gmail.com</a>
+    </p>
+  </footer>
 
-  <script>
-    function openModal() {
-      document.getElementById("signinModal").style.display = "block";
-    }
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
-    function closeModal() {
-      document.getElementById("signinModal").style.display = "none";
-    }
-
-    window.onclick = function(event) {
-      const modal = document.getElementById("signinModal");
-      if (event.target === modal) {
-        modal.style.display = "none";
-      }
+    const firebaseConfig = {
+      apiKey: "AIzaSyAylYc2T19S1qD3UWwVmPr-06zdvOdbK8o",
+      authDomain: "fitneogin-3311d.firebaseapp.com",
+      projectId: "fitneogin-3311d",
+      storageBucket: "fitneogin-3311d.appspot.com",
+      messagingSenderId: "189125336169",
+      appId: "1:189125336169:web:da961ad3b1731aad1d56f8"
     };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.openModal = function () {
+      document.getElementById("signinModal").style.display = "block";
+    };
+    window.closeModal = function () {
+      document.getElementById("signinModal").style.display = "none";
+      document.getElementById("msg").textContent = "";
+    };
+    window.onclick = function (event) {
+      if (event.target === document.getElementById("signinModal")) closeModal();
+    };
+    window.handleLogin = function () {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const msg = document.getElementById("msg");
+      if (!email || !password) {
+        msg.textContent = "Please enter both email and password.";
+        return;
+      }
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("✅ Login successful!");
+          closeModal();
+        })
+        .catch((error) => {
+          msg.textContent = `❌ ${error.message}`;
+        });
+    };
+
+    document.getElementById("fitnessForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const height = parseFloat(document.getElementById("height").value);
+      const weight = parseFloat(document.getElementById("weight").value);
+      const healthyEating = document.getElementById("healthyEating").checked;
+      const didExercise = document.getElementById("didExercise").checked;
+      const completedSteps = document.getElementById("completedSteps").checked;
+
+      let score = 0;
+      if (healthyEating) score += 1;
+      if (didExercise) score += 1;
+      if (completedSteps) score += 1;
+
+      let level;
+      if (score === 3) level = "🔥 Max Fitness Level!";
+      else if (score === 2) level = "💪 Moderate Level";
+      else if (score === 1) level = "🧱 Beginner";
+      else level = "😴 Lazy Day... Try again!";
+
+      document.getElementById("resultBox").innerHTML =
+        `<h3>Fitness Score: ${score}/3</h3><p>${level}</p>`;
+    });
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
+    camera.position.set(0, 1, 3);
+
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("modelCanvas"), alpha: true, antialias: true });
+    const modelContainer = document.querySelector(".model-container");
+    renderer.setSize(modelContainer.clientWidth, modelContainer.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(1, 1, 1);
+    scene.add(directionalLight);
+
+    const loader = new THREE.GLTFLoader();
+    loader.load("model.glb", (gltf) => {
+      const model = gltf.scene;
+      model.scale.set(1, 1, 1);
+      model.position.set(0, 0, 0);
+      model.rotation.y = Math.PI;
+      scene.add(model);
+      animate();
+      document.getElementById("loading").style.display = "none";
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener("resize", () => {
+      const width = modelContainer.clientWidth;
+      const height = modelContainer.clientHeight;
+      renderer.setSize(width, height);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    });
   </script>
 </body>
 </html>
